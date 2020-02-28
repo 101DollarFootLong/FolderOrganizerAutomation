@@ -52,7 +52,7 @@ class Cleaner:
                         else:
                             shutil.move(f,"./OTHERS/{}".format(f))
 
-path = "/Users/thienle/Desktop/MainDesktop/DataScience/Python/FolderCleanUp/Test"
+path = "/Users/thienle/Desktop/MainDesktop/DataScience/Python/FolderOrganizerAutomation/TestFolder"
 dict_ext = getExtDict()
 DIRS = list(dict_ext.keys()) + ["FOLDERS", "OTHERS","RECENT"]
 if __name__ == "__main__":
