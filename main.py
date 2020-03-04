@@ -5,6 +5,7 @@ from datetime import datetime,date
 from file_extensions import getExtDict
 from pathlib import Path
 import time
+from sys import platform
 
 class Cleaner:
     def __init__(self, path, dir_folders, dict_ext, recent_date):
@@ -16,17 +17,56 @@ class Cleaner:
         self.currentTime = datetime.now()
         start_time = time.time()
 
-        self.dirMaker()
-        self.CreateFolder()
-        self.updateRecent()
-        self.folderOrginizer()
-        duration = self.currentTime - datetime.now()
-        print("This Program took about ", time.time() - start_time)
+        user_input = self.userInput()
+        flag = True
+        while(flag):
+            if user_input == "c":
+                self.dirMaker()
+                self.CreateFolder()
+                self.updateRecent()
+                self.folderOrginizer()
+                duration = self.currentTime - datetime.now()
+                print("This Program took about ", time.time() - start_time)
+                flag = False
+            elif user_input == "u":
+                self.dirMaker()
+                self.unpackFiles()
+                duration = self.currentTime - datetime.now()
+                print("This Program took about ", time.time() - start_time)
+                flag = False
+            else:
+                print("Please select either c for clean or u for unpack")
+                user_input = self.userInput()
 
     def dirMaker(self):
-        os.chdir(self.path)
-        self.files = os.listdir()
-        
+        try: 
+            os.chdir(self.path)
+            self.files = os.listdir()
+        except:
+            print("Make sure the folder destination is correct")
+
+    def userInput(self):
+        val = input("Would you like to clean or unpack the files from the Folder?(c/u): ")
+        return val.lower()
+
+    def unpackFiles(self):
+        # check for the operation system to concate the right path syntax
+        if platform == "win32":
+            file_syntax = "\\"
+        else: 
+            file_syntax = "/"
+
+        if os.path.isdir(self.path + file_syntax + "OTHERS"):
+            for file in self.files:
+                full_path = self.path + file_syntax + file
+                subfile = os.listdir(full_path)
+                for index in range(len(subfile)):
+                    path_to_each_files = full_path + file_syntax + subfile[index]
+                    shutil.move(path_to_each_files,self.path)
+                os.rmdir(full_path)
+        else:
+            print("There are no right files to unpack at this time")
+
     def CreateFolder(self):
         for dir in self.dir_folders:
             if not os.path.isdir("./{}".format(dir)):
@@ -42,9 +82,7 @@ class Cleaner:
 
     def updateRecent(self):
         if not os.path.isdir("./RECENT"):
-
             return False
-            
         else:
             os.chdir(self.path+"/RECENT")
             for f in os.listdir():
@@ -56,9 +94,8 @@ class Cleaner:
     def folderOrginizer(self):
         dict_ext = self.dict_ext
         for f in self.files:
-            print(f)
+            # remove duplicates
             if re.search("\(\d+\)", f):
-                print(f)
                 if os.path.isdir(f):
                     shutil.rmtree(f)
                 else:
@@ -80,9 +117,9 @@ class Cleaner:
                         shutil.move(f,"./OTHERS/{}".format(f))
 
 # TODO: Build an unpacker, allow the user to unpack files from all or certain folders in case they want to add more folders later on.
-path = "/Users/thienle/Desktop/MainDesktop/DataScience/Python/FolderOrganizerAutomation/TestFolder"
+source = "C:\\Users\\thien.le\\Downloads"
 dict_ext = getExtDict()
 DIRS = list(dict_ext.keys()) + ["FOLDERS", "OTHERS","RECENT"]
 recent_date = 2
 if __name__ == "__main__":
-    folders_cleaner = Cleaner(path, DIRS,dict_ext, recent_date)
+    folders_cleaner = Cleaner(source, DIRS,dict_ext, recent_date)
