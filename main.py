@@ -3,6 +3,8 @@ import shutil
 import re
 from datetime import datetime,date
 from file_extensions import getExtDict
+from pathlib import Path
+import time
 
 class Cleaner:
     def __init__(self, path, dir_folders, dict_ext, recent_date):
@@ -12,12 +14,14 @@ class Cleaner:
         self.dict_ext = dict_ext
         self.recent_date = recent_date
         self.currentTime = datetime.now()
+        start_time = time.time()
 
         self.dirMaker()
         self.CreateFolder()
+        self.updateRecent()
         self.folderOrginizer()
         duration = self.currentTime - datetime.now()
-        print("This Program took about ", duration.seconds)
+        print("This Program took about ", time.time() - start_time)
 
     def dirMaker(self):
         os.chdir(self.path)
@@ -36,10 +40,21 @@ class Cleaner:
         diff = self.currentTime - file_time
         return diff.days
 
-    # TODO: Set a flag if the user want their duplicate files to be remove
+    def updateRecent(self):
+        if not os.path.isdir("./RECENT"):
+            return False
+        else:
+            os.chdir(self.path+"/RECENT")
+            for f in os.listdir():
+                file_birth = self.getTimeDiff(f)
+                if file_birth > self.recent_date:
+                    shutil.move(f,self.path)
+        os.chdir(self.path)
+
     def folderOrginizer(self):
         dict_ext = self.dict_ext
         for f in self.files:
+            print(f)
             if re.search("\(\d+\)", f):
                 print(f)
                 if os.path.isdir(f):
