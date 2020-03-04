@@ -42,7 +42,9 @@ class Cleaner:
 
     def updateRecent(self):
         if not os.path.isdir("./RECENT"):
+
             return False
+            
         else:
             os.chdir(self.path+"/RECENT")
             for f in os.listdir():
